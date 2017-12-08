@@ -1,0 +1,41 @@
+The Things Network Ithaca layer
+
+This layer depends on: meta-mlinux
+
+This layer modifies mLinux for specific requirements of The Things
+network and maintaining a large number of Conduits.  It does this by:
+
+A. Reducing the size of the image
+
+Reducing the amount of bandwidth and storage that is needed for an
+update.
+
+This is done by removing packages and frameworks:
+
+1. Java
+2. Ruby
+3. Perl
+4. sqlite3
+5. Lighthttpd
+6. PHP
+
+B. Adding useful tools
+
+1. sudo
+2. python packages required by Ansible
+3. ttn-packet-forwarder
+
+C. Modifying init scripts
+
+The unmountfs and config services are modified to allow perserving
+more state when mLinux is being updated.  This allows updates to be
+performed remotely.
+
+/var/config/upgrade/before.d
+/var/config/upgrade/after.d
+
+------------
+  USAGE
+------------
+
+

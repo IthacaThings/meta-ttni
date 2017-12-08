@@ -1,0 +1,9 @@
+The Things Network Ithaca layer
+
+This layer depends on: meta-mlinux
+
+This layer modifies mLinux for specific requirements of The Things
+network and maintaining a large number of Conduits.  It does this by:
+
+See the branch of this repo matching the version of mLinux you are
+using for details.

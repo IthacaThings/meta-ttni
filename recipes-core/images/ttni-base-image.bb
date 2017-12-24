@@ -59,9 +59,6 @@ python-unixadmin \
 python-xml \
 "
 
-# TTN
-IMAGE_INSTALL += "python-distutils python-pkgutil"
-
 # Ruby support
 #TTN IMAGE_INSTALL += "ruby"
 #TTN IMAGE_INSTALL += "ruby-sqlite3"
@@ -89,9 +86,21 @@ IMAGE_INSTALL += "venus-gps"
 IMAGE_INSTALL += "pps-tools"
 
 # When ntp is to use the GPS, gps-utils is required
+#TTN - XXX does gpsd interfere with the packet forwarder?
 IMAGE_INSTALL += "gpsd ntp ntp-utils gps-utils gpsd-udev"
 
 IMAGE_INSTALL += "uvccapture"
 
-#TTN
-IMAGE_INSTALL += "sudo"
+#TTN additions follow
+
+# Required to run Ansible
+IMAGE_INSTALL += "python-distutils python-pkgutil sudo"
+
+# To preserve configuration through a firmware update
+IMAGE_INSTALL += "preserve"
+
+# Required for mp_packet_forwarder
+IMAGE_INSTALL += "libmpsse"
+
+# Useful utilities
+IMAGE_INSTALL += "htop"

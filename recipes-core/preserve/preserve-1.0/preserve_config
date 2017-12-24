@@ -1,0 +1,48 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          preserve_links
+# Required-Start:
+# Required-Stop:     
+# Default-Start:     0 6
+# Default-Stop:      
+# Short-Description: Preserve any links into non-volatile file systems
+# Description:
+### END INIT INFO
+
+filter_links () {
+    local dirname=$1
+
+    echo '#!/bin/sh'
+    echo 'echo "Restoring symlinks"'
+
+    while read target; do
+	source=$(readlink "${target}")
+	expr "${source}" : "${dirname}/" > /dev/null || continue
+	echo "ln -svf ${source} ${target}"
+    done
+
+    echo 'rm $0'
+}
+
+preserve_links () {
+    local dir=$1
+
+    restdir="${dir}/restore.d"
+
+    if [ ! -d "${restdir}" ]; then
+	mkdir -m "0755" "${restdir}"
+    fi
+
+    links_file=${restdir}/10links
+
+    find / -xdev -type l | filter_links ${dir} > "${links_file}"
+    chmod 700 "${links_file}"
+}
+
+if [ -f /var/volatile/do_flash_upgrade ]; then
+    preserve_links /var/config
+    # restore_links /var/oem
+fi
+
+exit 0
+

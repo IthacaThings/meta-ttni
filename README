@@ -1,9 +1,9 @@
-The Things Network Ithaca layer
+The Things Network Ithaca mLinux layer
 
 This layer depends on: meta-mlinux
 
-This layer modifies mLinux for specific requirements of The Things
-network and maintaining a large number of Conduits.  It does this by:
+This layer modifies mLinux for specific requirements of *The Things
+Network* and maintaining a large number of Conduits.  It does this by:
 
 A. Reducing the size of the image
 
@@ -18,24 +18,37 @@ This is done by removing packages and frameworks:
 4. sqlite3
 5. Lighthttpd
 6. PHP
+7. Default lora packages and mosquitto 
 
 B. Adding useful tools
 
-1. sudo
-2. python packages required by Ansible
-3. ttn-packet-forwarder
+1. Useful utilities (sudo, htop, ntp, ntp-utils)
+2. python packages required by Ansible (python-distutils, python-pkgutil)
+3. Dependencies ttn-packet-forwarder (libmpsse)
 
-C. Modifying init scripts
+A future goal is to remove node.js, but this is required to generate
+the configuration files for 
 
-The unmountfs and config services are modified to allow perserving
-more state when mLinux is being updated.  This allows updates to be
-performed remotely.
+C. How this works
 
-/var/config/upgrade/before.d
-/var/config/upgrade/after.d
+The *preserve* package adds two init scripts:
+
+1. preserve_config
+
+This runs at shutdown and if /var/volatile/do_flash_upgrade exists,
+makes a list of links into /var/config and stores them as an
+executable shell script.
+
+2. restore_config
+
+This runs at startup only at the first boot after a firmware upgrade
+and runs all scripts in /var/config/restore.d and /var/oem/restore.d
+with run-parts.
 
 ------------
   USAGE
 ------------
+
+XXX
 
 

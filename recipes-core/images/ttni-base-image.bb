@@ -6,6 +6,7 @@ require recipes-core/images/mlinux-base-image.bb
 
 DESCRIPTION = "mLinux image for TTN"
 
+# Lighttpd web server
 LIGHTTPD = "lighttpd \
             lighttpd-module-cgi lighttpd-module-indexfile \
             lighttpd-module-redirect lighttpd-module-auth  \
@@ -14,93 +15,115 @@ LIGHTTPD = "lighttpd \
             lighttpd-module-scgi lighttpd-module-alias \
             lighttpd-module-dirlisting  lighttpd-module-staticfile \
             "
+#IMAGE_INSTALL_append = " ${LIGHTTPD}"
 
-# Lighttpd web server
-#TTN IMAGE_INSTALL += "${LIGHTTPD}"
-
-#TTN IMAGE_INSTALL += "sqlite3"
-
-IMAGE_INSTALL += "autossh"
+SQLITE3 = "sqlite3"
+#IMAGE_INSTALL_append = " ${SQLITE3}"
 
 # Monit system/process monitor
-IMAGE_INSTALL += "monit"
+MONIT = "monit"
+#IMAGE_INSTALL_append = " ${MONIT}"
 
 # LoRa support (MTAC-LORA accessory card)
-#TTN IMAGE_INSTALL += "lora-gateway-utils lora-network-server lora-query lora-packet-forwarder-usb"
+LORA = "lora-gateway-utils \
+      	lora-network-server \
+	lora-query \
+	lora-packet-forwarder-usb \
+	"
+#IMAGE_INSTALL_append = "${LORA}"
 
 # MQTT server
-#TTN IMAGE_INSTALL += "mosquitto mosquitto-clients"
+MOSQUITTO = "mosquitto \
+	     mosquitto-clients \
+	     "
+#IMAGE_INSTALL_append = " ${MOSQUITTO}"
 
 # Perl support
-#TTN IMAGE_INSTALL += "perl"
-#TTN IMAGE_INSTALL += "perl-module-io perl-module-fcntl"
-# not in meta-oe or oe-core...
-#IMAGE_INSTALL += "libdevice-serialport-perl"
-#IMAGE_INSTALL += "libexpect-perl"
+PERL = "perl \
+        perl-module-io perl-module-fcntl \
+	"
+#IMAGE_INSTALL_append = " ${PERL}"
 
 # Python support
-IMAGE_INSTALL += "python"
-# Python modules
-IMAGE_INSTALL += "python-async \
-python-argparse \
-python-compression \
-python-dateutil \
-python-html \
-python-psutil \
-python-pycurl \
-python-pyopenssl \
-python-pyserial \
-python-pyudev \
-python-pyusb \
-python-simplejson \
-python-syslog \
-python-textutils \
-python-unixadmin \
-python-xml \
-"
+PYTHON = "python \
+          python-async \
+	  python-argparse \
+	  python-compression \
+	  python-dateutil \
+	  python-html \
+	  python-psutil \
+	  python-pycurl \
+	  python-pyopenssl \
+	  python-pyserial \
+	  python-pyudev \
+	  python-pyusb \
+	  python-simplejson \
+	  python-syslog \
+	  python-textutils \
+	  python-unixadmin \
+	  python-xml \
+	  "
+IMAGE_INSTALL_append = " ${PYTHON}"
 
 # Ruby support
-#TTN IMAGE_INSTALL += "ruby"
-#TTN IMAGE_INSTALL += "ruby-sqlite3"
-#TTN IMAGE_INSTALL += "ruby-serialport"
+RUBY = "ruby \
+        ${@bb.utils.contains('IMAGE_INSTALL', '${SQLITE3}', 'ruby-sqlite3', '', d)} \
+	ruby-serialport \
+	"
+#IMAGE_INSTALL_append = " ${RUBY}"
 
 # OpenJDK Java runtime
-#TTN IMAGE_INSTALL += "openjdk-7-jre"
-# OpenJDK with JamVM VM (Multi-Tech default)
-#TTN IMAGE_INSTALL += "openjdk-7-vm-jamvm"
-# OpenJDK with CACAO VM (run with 'java -cacao')
-#TTN IMAGE_INSTALL += "openjdk-7-vm-cacao"
-# OpenJDK Zero VM (run with 'java -zero')
-#TTN IMAGE_INSTALL += "openjdk-7-vm-zero"
+OPENJDK = "openjdk-7-jre \
+	   openjdk-7-vm-jamvm \
+	   openjdk-7-vm-cacao \ 
+	   openjdk-7-vm-zero \
+	   "
+#IMAGE_INSTALL_append = " ${OPENJDK}"
 
 # PHP support
-#TTN IMAGE_INSTALL += "php php-cli php-cgi"
+PHP = "php \
+       php-cli \
+       php-cgi \
+       "
+#IMAGE_INSTALL_append = " ${PHP}"
 
 # Node.js support
-IMAGE_INSTALL += "nodejs nodejs-npm"
+# This is currently needed for the mp_packet_forwarder
+NODEJS = "nodejs \
+          nodejs-npm \
+	  "
+#IMAGE_INSTALL_append = " ${NODEJS}"
 
-# Multi-Tech SMS Utility (see http://git.multitech.net)
-IMAGE_INSTALL += "sms-utils"
-# Multi-Tech GPS Utility
-IMAGE_INSTALL += "venus-gps"
-IMAGE_INSTALL += "pps-tools"
+# NTP support
+NTP = "ntp \
+       ntp-utils \
+       "
+IMAGE_INSTALL_append = " ${NTP}"
 
-# When ntp is to use the GPS, gps-utils is required
-#TTN - XXX does gpsd interfere with the packet forwarder?
-IMAGE_INSTALL += "gpsd ntp ntp-utils gps-utils gpsd-udev"
-
-IMAGE_INSTALL += "uvccapture"
-
-#TTN additions follow
+# GPS support (conflicts with Kersing packet forwarder)
+GPS = "venus-gps \
+       pps-tools \
+       gpsd \
+       gps-utils \
+       gps-udev \
+       "
+#IMAGE_INSTALL_append = " ${GPS}"
 
 # Required to run Ansible
-IMAGE_INSTALL += "python-distutils python-pkgutil sudo"
+ANSIBLE = "python-distutils \
+	   python-pkgutil \
+	   sudo \
+	   "
+IMAGE_INSTALL_append = " ${ANSIBLE}"
 
 # To preserve configuration through a firmware update
-IMAGE_INSTALL += "preserve"
+IMAGE_INSTALL_append = " preserve"
+
+# Required for ssh tunnels
+IMAGE_INSTALL_append = " autossh"
 
 # Required for mp_packet_forwarder
-IMAGE_INSTALL += "libmpsse"
+IMAGE_INSTALL_append = " libmpsse"
 
 # Useful utilities
-IMAGE_INSTALL += "htop"
+IMAGE_INSTALL_append = " htop logrotate"

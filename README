@@ -2,34 +2,34 @@ The Things Network Ithaca mLinux layer
 
 This layer depends on: meta-mlinux
 
-This layer modifies mLinux for specific requirements of *The Things
-Network* and maintaining a large number of Conduits.  It does this by:
+This layer modifies mLinux for specific requirements of _The Things
+Network_ and maintaining a large number of Conduits.  It does this by:
 
 A. Reducing the size of the image
 
 Reducing the amount of bandwidth and storage that is needed for an
-update.
-
-This is done by removing packages and frameworks:
+update.  The following packages are removed. They can be re-installed
+via opkg.
 
 1. Java
 2. Ruby
 3. Perl
 4. sqlite3
-5. Lighthttpd
+5. Lighttpd
 6. PHP
 7. Default lora packages and mosquitto 
+8. Gpsd
 
 B. Adding useful tools
 
-1. Useful utilities (sudo, htop, ntp, ntp-utils)
+1. Useful utilities (sudo, htop, ntp, ntp-utils, logrotate)
 2. python packages required by Ansible (python-distutils, python-pkgutil)
 3. Dependencies ttn-packet-forwarder (libmpsse)
 
 A future goal is to remove node.js, but this is required to generate
-the configuration files for 
+the configuration files for the packet forwarder
 
-C. How this works
+C. Preserving configuration
 
 The *preserve* package adds two init scripts:
 
@@ -49,6 +49,19 @@ with run-parts.
   USAGE
 ------------
 
-XXX
+1. Configure the MACHINE in conf/local.conf (_mtcdt_ for Conduit,
+   _mtcap_ for Conduit AP)
+1. Check out this layer and move it in place of *layers/user.layer*.
+2. Build the ttni image
+```
+$ bitbake ttni-base-image
+```
+3. Deploy the images from _build/tmp/deploy/image/mtcdt_ or
+   _build/tmp/deploy/image/mtcap_.
+```
+$ scp -p build/tmp/deploy/image/mtcdt/ttni-base-image-mtcdt-upgrade-withboot.bin root@GATEWAYIP
+$ ssh root@GATEWAYIP /usr/sbin/mlinux-firmware-upgrade ttni-base-image-mtcdt-upgrade-withboot.bin
+```
+
 
 

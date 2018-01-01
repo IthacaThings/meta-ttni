@@ -51,6 +51,12 @@ This runs at startup only at the first boot after a firmware upgrade
 and runs all scripts in /var/config/restore.d and /var/oem/restore.d
 with run-parts.
 
+## DHCP by default
+
+THe default configuration with this image is DHCP on the Ethernet
+interface. This configuration is only applied if the file
+_/var/config/force_defaults_ exists when a Conduit is booted.
+
 # Usage
 
 +. Configure the MACHINE in conf/local.conf (_mtcdt_ for Conduit,

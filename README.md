@@ -10,21 +10,27 @@ specific requirements of [The Things
 Network](https://console.thethingsnetwork.org/) and maintaining a
 large number of Conduits.  It does this by:
 
-## Reducing the size of the image
+## Reducing the size of the Conduit image
 
 Reducing the amount of bandwidth and storage that is needed for an
 update.  The following packages are removed. They can be re-installed
 via _opkg_ command.
 
 + mosquitto 
-+.PHP
-+.gpsd
-+.java
-+.lighttpd
-+.lora packages
-+.perl
-+.ruby
-+.sqlite3
++ PHP
++ gpsd
++ java
++ lighttpd
++ lora packages
++ perl
++ ruby
++ sqlite3
+
+### Adding packages to Conduit AP
+
+The Conduit AP system comes with a minimial configuration that does
+not have packages installed needed to run TTN and Ansible.  These are
+added by default so they do not need to be installed.
 
 ## Adding useful tools
 

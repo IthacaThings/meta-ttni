@@ -1,18 +1,12 @@
 #!/bin/sh
 
-# c95531ea4b200207b4e9e1c3eb8f34aa  at91bootstrap_pmecc_padded.bin
-# 590740bcddd6ef15427b3e1ac50ef858  at91sam9x5ek-nandflashboot-uboot-3.5.3-r3.bin
-# e82d85bade5f9141ccaacbf5e3c20fa6  mlinux-mtcap-image-mtcap-20170920182137.rootfs.jffs2
-# 983c3cd4d811a1585489ddaade012162  mlinux-mtcap-image-mtcap-upgrade.bin
-# 2e70df288b72460f7ad70d4f5f22363a  mlinux-mtcap-image-mtcap-upgrade-withboot.bin
-# 9750c8bd5446e6e5900ec2672ed4ca4f  u-boot-mtcap-2012.10-r6.bin
-# de9c0673f9383818a590ffee0a1c6034  uImage--3.12.27-r14.2-mtcap-20170920182137.bin
-
+bitbake="../mlinux-be/bitbake_ml"
+image="ttni-base-image"
 machines="mtcap mtcdt"
 files="at91bootstrap_pmecc_padded.bin \
        at91sam9x5ek-nandflashboot-uboot-3.5.3-r3.bin \
-       ttni-base-image-\${machine}-upgrade.bin \
-       ttni-base-image-\${machine}-upgrade-withboot.bin \
+       ${image}-\${machine}-upgrade.bin \
+       ${image}-\${machine}-upgrade-withboot.bin \
        u-boot-\${machine}-2012.10-r6.bin \
        "
 image_root="build/tmp/deploy/images"
@@ -40,6 +34,7 @@ fi
 test -d "${version_dir}" || mkdir "${version_dir}" || exit 1
 
 for machine in ${machines}; do
+    MACHINE=${machine} ${bitbake} ${image} || exit 1
     if [ ! -d "${image_root}/${machine}" ]; then
 	echo "${progname}: image dir for ${machine} does not exist in ${image_root}" >&2
 	exit 1

@@ -110,8 +110,11 @@ GPS = "venus-gps \
 #IMAGE_INSTALL_append = " ${GPS}"
 
 # Required to run Ansible
-ANSIBLE = "python-distutils \
+ANSIBLE = "nodejs \
+	   python-distutils \
+	   python-json \
 	   python-pkgutil \
+	   python-shell \
 	   sudo \
 	   "
 IMAGE_INSTALL_append = " ${ANSIBLE}"

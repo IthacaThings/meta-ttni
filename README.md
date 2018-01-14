@@ -35,7 +35,8 @@ added by default so they do not need to be installed.
 ## Adding useful tools
 
 + Useful utilities (sudo, htop, ntp, ntp-utils, logrotate)
-+ python packages required by Ansible (python-distutils, python-pkgutil)
++ python packages required by Ansible (python-distutils, python-json,
+  python-pkgutil, pythong-shell)
 + Dependencies mp-packet-forwarder (libmpsse)
 
 A future goal is to remove node.js, but this is required to generate

@@ -66,14 +66,14 @@ _/var/config/force_defaults_ exists when a Conduit is booted.
 
 # Usage
 
-+. Configure the MACHINE in conf/local.conf (_mtcdt_ for Conduit,
++ Configure the MACHINE in conf/local.conf (_mtcdt_ for Conduit,
    _mtcap_ for Conduit AP)
-+. Check out this layer and move it in place of *layers/user.layer*.
-+. Build the ttni image
++ Check out this layer and move it in place of *layers/user.layer*.
++ Build the ttni image
 ```
 $ bitbake ttni-base-image
 ```
-+. Deploy the images from _build/tmp/deploy/image/mtcdt_ or
++ Deploy the images from _build/tmp/deploy/image/mtcdt_ or
    _build/tmp/deploy/image/mtcap_.
 ```
 $ scp -p build/tmp/deploy/image/mtcdt/ttni-base-image-mtcdt-upgrade-withboot.bin root@GATEWAYIP

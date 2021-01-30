@@ -1,0 +1,37 @@
+#!/bin/sh
+
+NAME=monit
+
+ENABLED=yes
+[ -f /etc/default/$NAME ] && . /etc/default/$NAME
+
+if [ "$ENABLED" != "yes" ]; then
+  echo "$NAME: disabled in /etc/default"
+  exit
+fi
+
+case $1 in
+  start)
+    echo "Starting monit"
+    monit
+    ;;
+
+  stop)
+    echo "Stopping monit"
+    monit quit
+    ;;
+
+  restart)
+    echo "Stopping monit"
+    monit quit
+    echo "Starting monit"
+    monit
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 2
+    ;;
+esac
+
+

@@ -7,8 +7,8 @@ This layer depends on: meta-mlinux
 This layer modifies
 [mLinux](http://www.multitech.net/developer/software/mlinux/) for
 specific requirements of [The Things
-Network](https://console.thethingsnetwork.org/) and maintaining a
-large number of Conduits.  It does this by:
+Network](https://console.thethingsnetwork.org/) and for maintaining a
+large number of gateways.  It does this by:
 
 ## Reducing the size of the Conduit image
 
@@ -30,7 +30,7 @@ via _opkg_ command.
 
 The Conduit AP system comes with a minimial configuration that does
 not have packages installed needed to run TTN and Ansible.  These are
-added by default so they do not need to be installed.
+added by default so they do not need to be manually installed.
 
 ## Adding useful tools
 
@@ -60,7 +60,7 @@ with run-parts.
 
 ## DHCP by default
 
-THe default configuration with this image is DHCP on the Ethernet
+The default configuration with this image is DHCP on the Ethernet
 interface. This configuration is only applied if the file
 _/var/config/force_defaults_ exists when a Conduit is booted.
 

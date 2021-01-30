@@ -113,8 +113,10 @@ GPS = "venus-gps \
 ANSIBLE = "nodejs \
 	   python-distutils \
 	   python-json \
+	   ptthon-multiprocessing \
 	   python-pkgutil \
 	   python-shell \
+	   python-terminal \
 	   sudo \
 	   "
 IMAGE_INSTALL_append = " ${ANSIBLE}"

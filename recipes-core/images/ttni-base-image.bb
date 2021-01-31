@@ -46,13 +46,11 @@ PERL = "perl \
 
 # Python support
 PYTHON = "python \
-          python-async \
 	  python-argparse \
 	  python-compression \
 	  python-dateutil \
 	  python-html \
 	  python-psutil \
-	  python-pycurl \
 	  python-pyopenssl \
 	  python-pyserial \
 	  python-pyudev \
@@ -113,7 +111,7 @@ GPS = "venus-gps \
 ANSIBLE = "nodejs \
 	   python-distutils \
 	   python-json \
-	   ptthon-multiprocessing \
+	   python-multiprocessing \
 	   python-pkgutil \
 	   python-shell \
 	   python-terminal \
@@ -132,3 +130,9 @@ IMAGE_INSTALL_append = " libmpsse"
 
 # Useful utilities
 IMAGE_INSTALL_append = " htop logrotate"
+
+# These don't build with 5.3.0d
+IMAGE_INSTALL_remove += "nodejs \
+                         kernel-module-mtac-gpiob \
+			 kernel-module-mtac-xdot"
+ 

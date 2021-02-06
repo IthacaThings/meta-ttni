@@ -22,7 +22,11 @@ SQLITE3 = "sqlite3"
 
 # Monit system/process monitor
 MONIT = "monit"
-#IMAGE_INSTALL_append += "${MONIT}"
+IMAGE_INSTALL_append += "${MONIT}"
+
+# UFW firewall control
+UFW = "ufw"
+IMAGE_INSTALL_append += "${UFW}"
 
 # LoRa support (MTAC-LORA accessory card)
 LORA = "lora-gateway-utils \
@@ -31,6 +35,10 @@ LORA = "lora-gateway-utils \
 	lora-packet-forwarder-usb \
 	"
 #IMAGE_INSTALL_append = "${LORA}"
+
+# LoRa Basics Station
+LORA_BASICS = "lora-basic-station"
+IMAGE_INSTALL_append += "${LORA_BASICS}"
 
 # MQTT server
 MOSQUITTO = "mosquitto \

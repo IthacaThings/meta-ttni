@@ -15,14 +15,14 @@ LIGHTTPD = "lighttpd \
             lighttpd-module-scgi lighttpd-module-alias \
             lighttpd-module-dirlisting  lighttpd-module-staticfile \
             "
-#IMAGE_INSTALL_append = " ${LIGHTTPD}"
+#IMAGE_INSTALL_append += "${LIGHTTPD}"
 
 SQLITE3 = "sqlite3"
-#IMAGE_INSTALL_append = " ${SQLITE3}"
+#IMAGE_INSTALL_append += "${SQLITE3}"
 
 # Monit system/process monitor
 MONIT = "monit"
-#IMAGE_INSTALL_append = " ${MONIT}"
+#IMAGE_INSTALL_append += "${MONIT}"
 
 # LoRa support (MTAC-LORA accessory card)
 LORA = "lora-gateway-utils \
@@ -36,13 +36,13 @@ LORA = "lora-gateway-utils \
 MOSQUITTO = "mosquitto \
 	     mosquitto-clients \
 	     "
-#IMAGE_INSTALL_append = " ${MOSQUITTO}"
+#IMAGE_INSTALL_append += "${MOSQUITTO}"
 
 # Perl support
 PERL = "perl \
         perl-module-io perl-module-fcntl \
 	"
-#IMAGE_INSTALL_append = " ${PERL}"
+#IMAGE_INSTALL_append += "${PERL}"
 
 # Python support
 PYTHON = "python \
@@ -61,14 +61,14 @@ PYTHON = "python \
 	  python-unixadmin \
 	  python-xml \
 	  "
-IMAGE_INSTALL_append = " ${PYTHON}"
+IMAGE_INSTALL_append += "${PYTHON}"
 
 # Ruby support
 RUBY = "ruby \
         ${@bb.utils.contains('IMAGE_INSTALL', '${SQLITE3}', 'ruby-sqlite3', '', d)} \
 	ruby-serialport \
 	"
-#IMAGE_INSTALL_append = " ${RUBY}"
+#IMAGE_INSTALL_append += "${RUBY}"
 
 # OpenJDK Java runtime
 OPENJDK = "openjdk-7-jre \
@@ -76,27 +76,27 @@ OPENJDK = "openjdk-7-jre \
 	   openjdk-7-vm-cacao \ 
 	   openjdk-7-vm-zero \
 	   "
-#IMAGE_INSTALL_append = " ${OPENJDK}"
+#IMAGE_INSTALL_append += "${OPENJDK}"
 
 # PHP support
 PHP = "php \
        php-cli \
        php-cgi \
        "
-#IMAGE_INSTALL_append = " ${PHP}"
+#IMAGE_INSTALL_append += "${PHP}"
 
 # Node.js support
 # This is currently needed for the mp_packet_forwarder
 NODEJS = "nodejs \
           nodejs-npm \
 	  "
-#IMAGE_INSTALL_append = " ${NODEJS}"
+#IMAGE_INSTALL_append += "${NODEJS}"
 
 # NTP support
 NTP = "ntp \
        ntp-utils \
        "
-IMAGE_INSTALL_append = " ${NTP}"
+IMAGE_INSTALL_append += "${NTP}"
 
 # GPS support (conflicts with Kersing packet forwarder)
 GPS = "venus-gps \
@@ -105,7 +105,7 @@ GPS = "venus-gps \
        gps-utils \
        gps-udev \
        "
-#IMAGE_INSTALL_append = " ${GPS}"
+#IMAGE_INSTALL_append += "${GPS}"
 
 # Required to run Ansible
 ANSIBLE = "nodejs \
@@ -117,19 +117,19 @@ ANSIBLE = "nodejs \
 	   python-terminal \
 	   sudo \
 	   "
-IMAGE_INSTALL_append = " ${ANSIBLE}"
+IMAGE_INSTALL_append += "${ANSIBLE}"
 
 # To preserve configuration through a firmware update
-IMAGE_INSTALL_append = " preserve"
+IMAGE_INSTALL_append += "preserve"
 
 # Required for ssh tunnels
-IMAGE_INSTALL_append = " autossh"
+IMAGE_INSTALL_append += "autossh"
 
 # Required for mp_packet_forwarder
-IMAGE_INSTALL_append = " libmpsse"
+IMAGE_INSTALL_append += "libmpsse"
 
 # Useful utilities
-IMAGE_INSTALL_append = " htop logrotate"
+IMAGE_INSTALL_append += "htop logrotate"
 
 # These don't build with 5.3.0d
 IMAGE_INSTALL_remove += "nodejs \

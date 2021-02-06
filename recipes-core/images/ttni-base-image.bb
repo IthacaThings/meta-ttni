@@ -140,7 +140,11 @@ IMAGE_INSTALL_append += "libmpsse"
 IMAGE_INSTALL_append += "htop logrotate"
 
 # These don't build with 5.3.0d
-IMAGE_INSTALL_remove += "nodejs \
+IMAGE_INSTALL_remove += "nodejs"
+
+# Remove these to make the image smaller
+IMAGE_INSTALL_remove += "kernel-module-mtac-eth \
                          kernel-module-mtac-gpiob \
-			 kernel-module-mtac-xdot"
- 
+                         kernel-module-mtac-mfser \
+                         kernel-module-mtac-pulse \
+                         kernel-module-mtac-xdot"

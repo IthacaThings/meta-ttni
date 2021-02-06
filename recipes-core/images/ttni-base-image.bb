@@ -139,12 +139,27 @@ IMAGE_INSTALL_append += "libmpsse"
 # Useful utilities
 IMAGE_INSTALL_append += "htop logrotate"
 
+# Remove these to make the image smaller
+#  FILESYSTEM_FEATURES
+IMAGE_INSTALL_remove += "dosfstools \
+                        cifs-utils"
+#  NETWORKING_FEATURES
+IMAGE_INSTALL_remove += "bridge-utils \
+                         inetutils-ftp"
+#  WIFI_FEATURES
+IMAGE_INSTALL_remove += "hostapd \
+                         hostapd-cfg"
+#  BLUETOOTH_FEATURES
+IMAGE_INSTALL_remove += "bluez5"
+#  MISC_FEATURES
+IMAGE_INSTALL_remove += "lrzsz"
+
+# Remove these kernel modules we don't plan to use
+IMAGE_INSTALL_remove += "kernel-module-mtac-eth \
+                          kernel-module-mtac-gpiob \
+                          kernel-module-mtac-mfser \
+                          kernel-module-mtac-pulse \
+                          kernel-module-mtac-xdot"
+
 # These don't build with 5.3.0d
 IMAGE_INSTALL_remove += "nodejs"
-
-# Remove these to make the image smaller
-IMAGE_INSTALL_remove += "kernel-module-mtac-eth \
-                         kernel-module-mtac-gpiob \
-                         kernel-module-mtac-mfser \
-                         kernel-module-mtac-pulse \
-                         kernel-module-mtac-xdot"

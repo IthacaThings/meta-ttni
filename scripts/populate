@@ -1,0 +1,51 @@
+#!/bin/sh
+
+bitbake="../mlinux-be/bitbake_ml"
+image="ttni-base-image"
+machines="mtcap mtcdt"
+files="at91bootstrap_pmecc_padded.bin \
+       at91sam9x5ek-nandflashboot-uboot-3.5.3-r3.bin \
+       ${image}-\${machine}-upgrade.bin \
+       ${image}-\${machine}-upgrade-withboot.bin \
+       u-boot-\${machine}-2012.10-r6.bin \
+       "
+image_root="build/tmp/deploy/images"
+progname=$(basename $0)
+
+if [ $# != 2 ]; then
+   echo "${progname}: Usage VERSION DESTDIR" >&2
+   exit 1
+fi
+
+version=$1
+destdir=$2
+
+if [ ! -d "${destdir}" ]; then
+    echo "${progname}: $destdir does not exist" >&2
+    exit 1
+fi
+
+if expr "${destdir}" : "/.*" > /dev/null; then
+    version_dir="${destdir}/${version}"
+else
+    version_dir="${PWD}/${destdir}/${version}"
+fi
+
+test -d "${version_dir}" || mkdir "${version_dir}" || exit 1
+
+for machine in ${machines}; do
+    MACHINE=${machine} ${bitbake} ${image} || exit 1
+    if [ ! -d "${image_root}/${machine}" ]; then
+	echo "${progname}: image dir for ${machine} does not exist in ${image_root}" >&2
+	exit 1
+    fi
+    test -d "${version_dir}/${machine}" || mkdir "${version_dir}/${machine}" || exit 1
+    (
+	cd "${image_root}/${machine}" || exit 1
+	eval rsync -av --delete "${files}" "${version_dir}/${machine}" || exit 1
+    )
+    (
+	cd "${version_dir}/${machine}" || exit 1
+	eval md5sum ${files} > md5sums.txt || exit 1
+    )
+done

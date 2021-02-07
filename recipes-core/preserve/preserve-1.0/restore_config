@@ -1,0 +1,34 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          restore_links
+# Required-Start:
+# Required-Stop:     
+# Default-Start:     S
+# Default-Stop:      
+# Short-Description: Restore any preserved links into non-volatile file systems
+# Description:
+### END INIT INFO
+
+FLAGFILE=/var/lib/restore.done
+
+. /etc/default/rcS
+
+if [ -f "${FLAGFILE}" ]; then
+    test "${VERBOSE}" == "no" || echo "Not performing restore after initial boot"
+    exit 0
+fi
+
+# Use default restore dirs
+if [ -z "${RESTORE_DIRS}" ]; then
+    RESTORE_DIRS="/var/config /var/oem"
+fi
+
+for dir in ${RESTORE_DIRS}; do
+    test -d "${dir}/restore.d" || continue
+    test "${VERBOSE}" == "no" || echo "Running restore in ${dir}"
+    run-parts "${dir}/restore.d"
+done
+
+touch "${FLAGFILE}"
+
+exit 0

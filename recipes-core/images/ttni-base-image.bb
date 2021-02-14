@@ -57,6 +57,7 @@ PYTHON = "python \
 	  python-argparse \
 	  python-compression \
 	  python-dateutil \
+          python-email \
 	  python-html \
 	  python-psutil \
 	  python-pyopenssl \

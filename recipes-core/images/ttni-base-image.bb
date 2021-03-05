@@ -94,13 +94,6 @@ PHP = "php \
        "
 #IMAGE_INSTALL_append += "${PHP}"
 
-# Node.js support
-# This is currently needed for the mp_packet_forwarder
-NODEJS = "nodejs \
-          nodejs-npm \
-	  "
-#IMAGE_INSTALL_append += "${NODEJS}"
-
 # NTP support
 NTP = "ntp \
        ntp-utils \
@@ -117,8 +110,7 @@ GPS = "venus-gps \
 #IMAGE_INSTALL_append += "${GPS}"
 
 # Required to run Ansible
-ANSIBLE = "nodejs \
-	   python-distutils \
+ANSIBLE = "python-distutils \
 	   python-json \
 	   python-multiprocessing \
 	   python-pkgutil \
@@ -161,6 +153,3 @@ IMAGE_INSTALL_remove += "kernel-module-mtac-eth \
                           kernel-module-mtac-mfser \
                           kernel-module-mtac-pulse \
                           kernel-module-mtac-xdot"
-
-# These don't build with 5.3.0d
-IMAGE_INSTALL_remove += "nodejs"

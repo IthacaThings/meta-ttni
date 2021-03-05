@@ -6,4 +6,4 @@
 SRC_URI += "file://network \
 	   "
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}""
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"

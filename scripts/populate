@@ -1,90 +1,51 @@
 #!/bin/sh
 
+bitbake="../mlinux-be/bitbake_ml"
 image="ttni-base-image"
 machines="mtcap mtcdt"
 files="at91bootstrap_pmecc_padded.bin \
-       \${machine}-nandflashboot-uboot-*.bin \
+       at91sam9x5ek-nandflashboot-uboot-3.5.3-r3.bin \
        ${image}-\${machine}-upgrade.bin \
        ${image}-\${machine}-upgrade-withboot.bin \
-       u-boot-\${machine}-*.bin \
+       u-boot-\${machine}-2012.10-r6.bin \
        "
 image_root="build/tmp/deploy/images"
-progname=$(basename ${0})
+progname=$(basename $0)
 
-# Determine version we are building
-version=$(git describe --exact-match) || exit $?
-if [ $? -ne 0 -o -z "${version}" -o "${version}" = "master" ]; then
-    echo "${progname}: Unable to determine version" >&2
-    exit 1
+if [ $# != 2 ]; then
+   echo "${progname}: Usage VERSION DESTDIR" >&2
+   exit 1
 fi
-mlinux_major_version="mlinux-$(expr ${version} : '\([0-9]*\)\..*')"
 
-# Find bitbake_ml
-for bitbake_ml in ./bitbake_ml ../mlinux-be/bitbake_ml ../mlinux-be/${mlinux_major_version}/bitbake_ml; do
-    test -e ${bitbake_ml} || continue
-    bitbake="$(realpath ${bitbake_ml})"
-done
-if [ -z "${bitbake}" ]; then
-    echo "${progname}: Unable to find bitbake_ml" >&2
-    exit 1
-fi
-echo "Using ${bitbake} to build"
+version=$1
+destdir=$2
 
-# Find mlinux-images dir
-for dir in ../mlinux-images ../../mlinux-images; do
-    test -d "${dir}" || continue
-    destdir="$(realpath ${dir})"
-done
 if [ ! -d "${destdir}" ]; then
     echo "${progname}: $destdir does not exist" >&2
     exit 1
 fi
+
 if expr "${destdir}" : "/.*" > /dev/null; then
     version_dir="${destdir}/${version}"
 else
     version_dir="${PWD}/${destdir}/${version}"
 fi
-echo "Saving build artifacts in ${version_dir}"
 
-# Create destdir for this version
-test -d "${version_dir}" || mkdir "${version_dir}" || exit $?
+test -d "${version_dir}" || mkdir "${version_dir}" || exit 1
 
-# See if we have run setup
-if [ ! -f build/conf/local.conf ]; then
-    if [ -z "${MTADM_PASSWORD}" ]; then
-	if [ -f password.txt ]; then
-	    eval $(sed 's/ = /=/' password.txt)
-	fi
-	if [ -z "${MTADM_PASSWORD}" ]; then
-	    echo "${progname} MTADM_PASSWORD is not set" >&2
-	    exit 1
-	fi
-    fi
-    MDADM_PASSWORD="${MTADM_PASSWORD}" ${bitbake} --setup || exit $?
-fi
-if [ ! -d layers/meta-ttni ]; then
-    meta_ttni=$(dirname $(dirname ${0}))
-    git clone ${meta_ttni} layers/meta-ttni
-fi
-# Ensure our layer is represented
-grep -s meta-ttni build/conf/bblayers.conf || sed -i 's/user-layer/meta-ttni/' build/conf/bblayers.conf
-
-# Build
 for machine in ${machines}; do
-    MACHINE=${machine} ${bitbake} ${image} || exit $?
+    MACHINE=${machine} ${bitbake} ${image} || exit 1
     if [ ! -d "${image_root}/${machine}" ]; then
 	echo "${progname}: image dir for ${machine} does not exist in ${image_root}" >&2
 	exit 1
     fi
-    test -d "${version_dir}/${machine}" || mkdir "${version_dir}/${machine}" || exit $?
+    test -d "${version_dir}/${machine}" || mkdir "${version_dir}/${machine}" || exit 1
     (
-	cd "${image_root}/${machine}" || exit $?
-	eval rsync -av --delete "${files}" "${version_dir}/${machine}" || exit $?
+	cd "${image_root}/${machine}" || exit 1
+	eval rsync -av --delete "${files}" "${version_dir}/${machine}" || exit 1
     )
     (
-	cd "${version_dir}/${machine}" || exit $?
-	eval md5sum ${files} > md5sum.txt || exit $?
+	cd "${version_dir}/${machine}" || exit 1
+	eval md5sum ${files} > md5sums.txt || exit 1
     )
 done
-
-exit 0

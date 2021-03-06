@@ -149,7 +149,6 @@ REMOVES += "bluez5 python-pybluez"
 #  MISC_FEATURES
 REMOVES += "lrzsz"
 
-PACKAGE_EXCLUDE_pn-ttni-base-image += "${REMOVES}"
 IMAGE_INSTALL_remove += "${REMOVES}"
 
 # Remove these kernel modules we don't plan to use

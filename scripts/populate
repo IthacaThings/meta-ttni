@@ -4,10 +4,10 @@ bitbake="../mlinux-be/bitbake_ml"
 image="ttni-base-image"
 machines="mtcap mtcdt"
 files="at91bootstrap_pmecc_padded.bin \
-       at91sam9x5ek-nandflashboot-uboot-3.5.3-r3.bin \
        ${image}-\${machine}-upgrade.bin \
        ${image}-\${machine}-upgrade-withboot.bin \
-       u-boot-\${machine}-2012.10-r6.bin \
+       u-boot-\${machine}-*.bin \
+       uImage--*.bin \
        "
 image_root="build/tmp/deploy/images"
 progname=$(basename $0)

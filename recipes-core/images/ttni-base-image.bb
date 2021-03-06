@@ -133,19 +133,24 @@ IMAGE_INSTALL_append += "libmpsse"
 IMAGE_INSTALL_append += "htop logrotate"
 
 # Remove these to make the image smaller
+REMOVES=""
+
 #  FILESYSTEM_FEATURES
-IMAGE_INSTALL_remove += "dosfstools \
-                        cifs-utils"
+REMOVES += "dosfstools \
+       	    cifs-utils"
 #  NETWORKING_FEATURES
-IMAGE_INSTALL_remove += "bridge-utils \
-                         inetutils-ftp"
+REMOVES += "bridge-utils \
+            inetutils-ftp"
 #  WIFI_FEATURES
-IMAGE_INSTALL_remove += "hostapd \
-                         hostapd-cfg"
+REMOVES += "hostapd \
+            hostapd-cfg"
 #  BLUETOOTH_FEATURES
-IMAGE_INSTALL_remove += "bluez5"
+REMOVES += "bluez5 python-pybluez"
 #  MISC_FEATURES
-IMAGE_INSTALL_remove += "lrzsz"
+REMOVES += "lrzsz"
+
+PACKAGE_EXCLUDE_pn-ttni-base-image += "${REMOVES}"
+IMAGE_INSTALL_remove += "${REMOVES}"
 
 # Remove these kernel modules we don't plan to use
 IMAGE_INSTALL_remove += "kernel-module-mtac-eth \

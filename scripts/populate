@@ -3,12 +3,6 @@
 bitbake="../mlinux-be/bitbake_ml"
 image="ttni-base-image"
 machines="mtcap mtcdt"
-files="at91bootstrap_pmecc_padded.bin \
-       ${image}-\${machine}-upgrade.bin \
-       ${image}-\${machine}-upgrade-withboot.bin \
-       u-boot-\${machine}-*.bin \
-       uImage--*.bin \
-       "
 image_root="build/tmp/deploy/images"
 progname=$(basename $0)
 
@@ -40,12 +34,11 @@ for machine in ${machines}; do
 	exit 1
     fi
     test -d "${version_dir}/${machine}" || mkdir "${version_dir}/${machine}" || exit 1
+    image_file="${image}-${machine}-upgrade.bin"
     (
 	cd "${image_root}/${machine}" || exit 1
-	eval rsync -av --delete "${files}" "${version_dir}/${machine}" || exit 1
-    )
-    (
+	cp -p "${image_file}" "${version_dir}/${machine}/${image_file}" 
 	cd "${version_dir}/${machine}" || exit 1
-	eval md5sum ${files} > md5sums.txt || exit 1
+	eval md5sum "${image_file}" > md5sums.txt || exit 1
     )
 done

@@ -7,3 +7,9 @@ network and maintaining a large number of Conduits.  It does this by:
 
 See the branch of this repo matching the version of mLinux you are
 using for details.
+
+# TODO
+  + Build package feed https://wiki.yoctoproject.org/wiki/TipsAndTricks/EnablingAPackageFeed
+  + Update populate script to upload to ttni.tech site
+  + Add mp_packet_forwarder to image
+  + Separate feed for mp_packet_forwarder

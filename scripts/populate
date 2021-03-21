@@ -4,41 +4,88 @@ bitbake="../mlinux-be/bitbake_ml"
 image="ttni-base-image"
 machines="mtcap mtcdt"
 image_root="build/tmp/deploy/images"
+feed_root="build/tmp/deploy/ipk"
 progname=$(basename $0)
 
-if [ $# != 2 ]; then
-   echo "${progname}: Usage VERSION DESTDIR" >&2
+remote_host=abomination.dreamhost.com
+remote_root=ttni.tech/mlinux
+
+do_build=yes
+do_delete=
+do_verbose=
+
+verbose () {
+    test -n "${do_verbose}" && echo "${*}"
+}
+
+while [ $# -gt 0 ]; do
+    case "${1}" in
+	--delete)
+	    do_delete=--delete
+	    shift
+	    ;;
+	--no-build|--nobuild)
+	    do_build=
+	    shift
+	    ;;
+	-x)
+	    set -x
+	    shift
+	    ;;
+	-v)
+	    do_verbose=-v
+	    shift
+	    ;;
+	*)
+	    break
+	    ;;
+    esac
+done
+
+if [ $# != 1 ]; then
+   echo "${progname}: Usage VERSION" >&2
    exit 1
 fi
 
 version=$1
-destdir=$2
 
-if [ ! -d "${destdir}" ]; then
-    echo "${progname}: $destdir does not exist" >&2
-    exit 1
+# Build the two images
+if [ -n "${do_build}" ]; then
+    for machine in ${machines}; do
+	verbose Building for ${machine}
+	MACHINE=${machine} ${bitbake} ${image} || exit 1
+    done
 fi
 
-if expr "${destdir}" : "/.*" > /dev/null; then
-    version_dir="${destdir}/${version}"
-else
-    version_dir="${PWD}/${destdir}/${version}"
-fi
-
-test -d "${version_dir}" || mkdir "${version_dir}" || exit 1
-
+# Copy the images to the distribution server
 for machine in ${machines}; do
-    MACHINE=${machine} ${bitbake} ${image} || exit 1
-    if [ ! -d "${image_root}/${machine}" ]; then
-	echo "${progname}: image dir for ${machine} does not exist in ${image_root}" >&2
+    verbose Sending image for ${machine}
+    local_image_dir="${image_root}/${machine}"
+    image_file="${image}-${machine}-upgrade.bin"
+    if [ ! -f "${local_image_dir}/${image_file}" ]; then
+	echo "${progname}: image ${local_image_dir_file} does not exist" >&2
 	exit 1
     fi
-    test -d "${version_dir}/${machine}" || mkdir "${version_dir}/${machine}" || exit 1
-    image_file="${image}-${machine}-upgrade.bin"
+    remote_image_dir="${remote_root}/images/${machine}/${version}"
+    ssh ${remote_host} mkdir -p "${remote_image_dir}" || exit 1
+
     (
-	cd "${image_root}/${machine}" || exit 1
-	cp -p "${image_file}" "${version_dir}/${machine}/${image_file}" 
-	cd "${version_dir}/${machine}" || exit 1
-	eval md5sum "${image_file}" > md5sums.txt || exit 1
+	cd "${local_image_dir}" || exit 1
+	md5sum "${image_file}" > md5sums.txt || exit 1
+	rsync -a ${do_verbose} --checksum ${do_delete} md5sums.txt "${image_file}" ${remote_host}:${remote_image_dir} || exit 1
     )
 done
+
+# Copy the package feeds to the distribution server
+verbose Building package-index
+${bitbake} package-index || exit 1
+(
+    cd "${feed_root}" || exit 1
+    test -s Packages || rm -f Packages
+
+    remote_feed_dir="${remote_root}/feeds/${version}"
+    ssh ${remote_host} mkdir -p "${remote_feed_dir}" || exit 1
+
+    verbose Sending feeds
+    rsync -a ${do_verbose} ${do_delete} * "${remote_host}:${remote_feed_dir}" || exit 1
+)

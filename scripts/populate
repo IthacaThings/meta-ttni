@@ -77,8 +77,10 @@ for machine in ${machines}; do
 done
 
 # Copy the package feeds to the distribution server
-verbose Building package-index
-${bitbake} package-index || exit 1
+for machine in ${machines}; do
+    verbose Building package-index for ${machine}
+    MACHINE=${machine} ${bitbake} package-index || exit 1
+done
 (
     cd "${feed_root}" || exit 1
     test -s Packages || rm -f Packages

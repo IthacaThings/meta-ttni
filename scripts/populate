@@ -13,6 +13,7 @@ remote_root=ttni.tech/mlinux
 do_build=yes
 do_delete=
 do_verbose=
+do_noop=
 
 verbose () {
     test -n "${do_verbose}" && echo "${*}"
@@ -34,6 +35,10 @@ while [ $# -gt 0 ]; do
 	    ;;
 	-v)
 	    do_verbose=-v
+	    shift
+	    ;;
+	-n)
+	    do_noop=-n
 	    shift
 	    ;;
 	*)
@@ -72,7 +77,8 @@ for machine in ${machines}; do
     (
 	cd "${local_image_dir}" || exit 1
 	md5sum "${image_file}" > md5sums.txt || exit 1
-	rsync -a ${do_verbose} --checksum ${do_delete} md5sums.txt "${image_file}" ${remote_host}:${remote_image_dir} || exit 1
+	chmod u+rwX,og+rX md5sums.txt "${image_file}"
+	rsync -a ${do_verbose} ${do_noop} --checksum ${do_delete} md5sums.txt "${image_file}" ${remote_host}:${remote_image_dir} || exit 1
     )
 done
 
@@ -89,5 +95,6 @@ done
     ssh ${remote_host} mkdir -p "${remote_feed_dir}" || exit 1
 
     verbose Sending feeds
-    rsync -a ${do_verbose} ${do_delete} * "${remote_host}:${remote_feed_dir}" || exit 1
+    chmod u+rwX,og+rX *
+    rsync -a ${do_verbose} ${do_noop} ${do_delete} * "${remote_host}:${remote_feed_dir}" || exit 1
 )

@@ -101,12 +101,12 @@ NTP = "ntp \
 IMAGE_INSTALL_append += "${NTP}"
 
 # GPS support (conflicts with Kersing packet forwarder)
-GPS = "venus-gps \
-       pps-tools \
-       gpsd \
+GPS = "gpsd \
+       gpspipe \
        gps-utils \
-       gps-udev \
        "
+# 5.3.31 changes gps requirements
+GPS_append = "${@ 'libgps24' if bb.utils.vercmp(d.getVar("PREFERRED_VERSION_gpsd"), "3.20") < 0 else 'gpsd-conf gpsd-gpsctl' }"
 #IMAGE_INSTALL_append += "${GPS}"
 
 # Required to run Ansible

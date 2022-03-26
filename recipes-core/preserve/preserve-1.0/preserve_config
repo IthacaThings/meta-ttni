@@ -17,8 +17,7 @@ filter_links () {
 
     while read target; do
 	source=$(readlink "${target}")
-	expr "${source}" : "${dirname}/" > /dev/null || continue
-	echo "ln -svf ${source} ${target}"
+	[[ "${source}" =~ ^${dirname}/ ]] && echo "ln -svf ${source} ${target}"
     done
 
     echo 'rm $0'
@@ -26,6 +25,8 @@ filter_links () {
 
 preserve_links () {
     local dir=$1
+
+    echo "Preserving links to /var/config"
 
     restdir="${dir}/restore.d"
 
@@ -37,7 +38,14 @@ preserve_links () {
 
     find / -xdev -type l | filter_links ${dir} > "${links_file}"
     chmod 700 "${links_file}"
+
+    echo "${links_file} containes $(grep -cF " ${dir}" ${links_file}) links to ${dir} to be restored on reinstall"
 }
+
+echo "${0}: ${*}"
+
+# We only run during "stop"
+test -z "${1}" -o "${1}" == "stop" || exit 0
 
 if [ -f /var/volatile/do_flash_upgrade ]; then
     preserve_links /var/config

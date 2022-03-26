@@ -9,6 +9,11 @@
 # Description:
 ### END INIT INFO
 
+echo "${0}: ${*}"
+
+# We only run during "start"
+test -z "${1}" -o "${1}" == "start" || exit 0
+
 FLAGFILE=/var/lib/restore.done
 
 . /etc/default/rcS

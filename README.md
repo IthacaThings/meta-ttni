@@ -78,7 +78,8 @@ default port is `/dev/modem`.
 
 `station.conf` differs per machine, so the package is built per
 machine (`PACKAGE_ARCH = "${MACHINE_ARCH}"`) instead of being shared
-by all arm926ejste machines.
+by all arm926ejste machines.  The release is bumped to `r4` so opkg
+replaces the shared `r3` build gateways already have.
 
 ### Preserving configuration
 

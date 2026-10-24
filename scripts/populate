@@ -7,7 +7,7 @@ image_root="build/tmp/deploy/images"
 feed_root="build/tmp/deploy/ipk"
 progname=$(basename $0)
 
-remote_host=abomination.dreamhost.com
+remote_host=ttni.tech
 remote_root=ttni.tech/mlinux
 
 do_build=yes

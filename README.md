@@ -59,6 +59,11 @@ the _openssl rehash_ command still works.
 Removes the DST_CA_Root_X3 certificate.
 This certificate expired and broke Let's Encrypt Certificates.
 
+Also removes the Comodo AAA Services and emSign ECC Root CA - G3 roots,
+distrusted after the October 2026 eMudhra compromise (see
+[ttn-multitech-cm#134](https://github.com/IthacaThings/ttn-multitech-cm/pull/134)).
+The package release is bumped so gateways upgrade from the feed.
+
 #### autossh
 
 Passes `--with-ssh` so configure doesn't need ssh on the build host.

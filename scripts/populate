@@ -87,6 +87,15 @@ for machine in ${machines}; do
     verbose Building package-index for ${machine}
     MACHINE=${machine} ${bitbake} package-index || exit 1
 done
+
+# Export the PR service database with the feed so package revisions can
+# be restored (conf/primport.conf) if the build directory is lost.
+# Recipes must be reparsed for the export, so drop the parse cache.
+verbose Exporting PR service database
+rm -rf build/tmp/cache
+${bitbake} -R conf/prexport.conf -p || exit 1
+cp build/tmp/log/db/prserv.inc "${feed_root}/prserv.inc" || exit 1
+
 (
     cd "${feed_root}" || exit 1
     test -s Packages || rm -f Packages

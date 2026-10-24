@@ -185,6 +185,18 @@ total 92504
 This script assumes that the containerized build environment is
 installed as _../mlinux-be/_
 
+It also exports the PR service database (the `.N` suffix on package
+revisions) as _prserv.inc_ next to the feed.  If the build directory
+is lost, restore it before building so revisions don't restart at
+`.0` and fall below what gateways already have:
+
+```sh
+bitbake -R conf/primport.conf -R /path/to/prserv.inc -p
+```
+
+_conf/prserv-floor.conf_ holds floors taken from the 5.3.31 feed on
+ttni.tech, whose PR database was lost; import it the same way.
+
 ## See Also
 
 + [Pre-built mLinux images using this layer](https://github.com/IthacaThings/mlinux-images)

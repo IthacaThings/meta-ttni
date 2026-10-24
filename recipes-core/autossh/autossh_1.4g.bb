@@ -12,6 +12,11 @@ inherit autotools-brokensep
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
+# configure insists on finding ssh on the build host; the path is unused
+# (see 0001-remove-hosttools-path-for-ssh.patch) and autossh defaults to
+# /usr/bin/ssh on the target.
+EXTRA_OECONF += "--with-ssh=/usr/bin/ssh"
+
 # Install target is broken (attempts to install in /usr/ and ignores
 # DESTDIR environment)
 do_install() {

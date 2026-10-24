@@ -2,7 +2,7 @@
 
 This layer depends on: meta-mlinux
 
-# Overview
+## Overview
 
 This layer modifies
 [mLinux](http://www.multitech.net/developer/software/mlinux/) for
@@ -10,13 +10,13 @@ specific requirements of [The Things
 Network](https://console.thethingsnetwork.org/) and for maintaining a
 large number of gateways.  It does this by:
 
-## Reducing the size of the Conduit image
+### Reducing the size of the Conduit image
 
 Reducing the amount of bandwidth and storage that is needed for an
 update.  The following packages are removed. They can be re-installed
 via _opkg_ command.
 
-+ mosquitto 
++ mosquitto
 + PHP
 + gpsd
 + java
@@ -26,13 +26,13 @@ via _opkg_ command.
 + ruby
 + sqlite3
 
-### Adding packages to Conduit AP
+#### Adding packages to Conduit AP
 
 The Conduit AP system comes with a minimial configuration that does
 not have packages installed needed to run TTN and Ansible.  These are
 added by default so they do not need to be manually installed.
 
-## Adding useful tools
+### Adding useful tools
 
 + Useful utilities (sudo, htop, ntp, ntp-utils, logrotate)
 + python packages required by Ansible (python-distutils, python-json,
@@ -42,81 +42,121 @@ added by default so they do not need to be manually installed.
 A future goal is to remove node.js, but this is required to generate
 the configuration files for the packet forwarder
 
-## Modifications of existing packages
+### Modifications of existing packages
 
-### Monit
+#### Monit
 
 Includes a later version
 
-### openssl-bin
+#### openssl-bin
 
 Remove the dependency on perl.
-This breaks the */usr/bin/c_rehash* script, which requires perl, but
-the *openssl rehash* command still works.
+This breaks the _/usr/bin/c_rehash_ script, which requires perl, but
+the _openssl rehash_ command still works.
 
-### ca-certificates
+#### ca-certificates
 
 Removes the DST_CA_Root_X3 certificate.
 This certificate expired and broke Let's Encrypt Certificates.
 
-## Preserving configuration
+#### autossh
+
+Passes `--with-ssh` so configure doesn't need ssh on the build host.
+
+#### sudo and minicom
+
+Their configure scripts probe the build host, so the values are pinned:
+sudo's time zone directory is `/usr/share/zoneinfo`, and minicom's
+default port is `/dev/modem`.
+
+#### lora-basic-station
+
+`station.conf` differs per machine, so the package is built per
+machine (`PACKAGE_ARCH = "${MACHINE_ARCH}"`) instead of being shared
+by all arm926ejste machines.
+
+### Preserving configuration
 
 The _preserve_ package adds two init scripts:
 
-### preserve_config
+#### preserve_config
 
 This runs at shutdown and if /var/volatile/do_flash_upgrade exists,
 makes a list of links into /var/config and stores them as an
 executable shell script.
 
-### restore_config
+#### restore_config
 
 This runs at startup only at the first boot after a firmware upgrade
 and runs all scripts in /var/config/restore.d and /var/oem/restore.d
 with run-parts.
 
-## DHCP by default
+### DHCP by default
 
 The default configuration with this image is DHCP on the Ethernet
 interface. This configuration is only applied if the file
 _/var/config/force_defaults_ exists when a Conduit is booted.
 
-# Usage
+## Usage
 
-## Configure
+### Configure
 
-+ Configure the MACHINE in *conf/local.conf* (_mtcdt_ for Conduit, _mtcap_ for Conduit AP)
++ Configure the MACHINE in _conf/local.conf_ (_mtcdt_ for Conduit,
+  _mtcap_ for Conduit AP)
 + If you are updating a downloaded image, copy _ROOT_PASSWORD_ and
-  __ROOT_PASSWORD_HASH_ into *conf/local.conf*
-+ Check out this layer and move it in place of *layers/user.layer*. 
-  Don't use symlinks when using the containerized build environment mentioned below.
-  
-## Build
+  __ROOT_PASSWORD_HASH_ into _conf/local.conf_
++ Check out this layer and move it in place of _layers/user.layer_.
+  Don't use symlinks when using the containerized build environment
+  mentioned below.
+
+### Build
 
 Build the ttni image:
-```
-$ bitbake ttni-base-image
-```
-+ Deploy the images from _build/tmp/deploy/image/mtcdt_ or _build/tmp/deploy/image/mtcap_.
-```
-$ scp -p build/tmp/deploy/image/mtcdt/ttni-base-image-mtcdt-upgrade-withboot.bin root@GATEWAYIP
-$ ssh root@GATEWAYIP /usr/sbin/mlinux-firmware-upgrade /home/root/ttni-base-image-mtcdt-upgrade-withboot.bin
+
+```sh
+bitbake ttni-base-image
 ```
 
-## Scripted build
+Deploy the images from _build/tmp/deploy/image/mtcdt_ or
+_build/tmp/deploy/image/mtcap_:
 
-A handy script exists in *scripts/populate* that can be used to build
+```sh
+image=ttni-base-image-mtcdt-upgrade-withboot.bin
+scp -p build/tmp/deploy/image/mtcdt/${image} root@GATEWAYIP:
+ssh root@GATEWAYIP /usr/sbin/mlinux-firmware-upgrade /home/root/${image}
+```
+
+### Source mirror
+
+`git://` no longer works on any host.  The mlinux-be build image
+fetches `git://` URLs over `https://`.  MultiTech's repositories can
+also be fetched from a local mirror, which keeps builds working if
+git.multitech.net goes away:
+
+```sh
+layers/meta-ttni/scripts/update-mirror /data/mLinux/mirror
+MLINUX_MIRROR=/data/mLinux/mirror ../mlinux-be/bitbake_ml ttni-base-image
+```
+
+`scripts/update-mirror` clones (or updates) every public repo on
+git.multitech.net and writes a `gitconfig` that redirects MultiTech
+URLs to the mirror.  `conf/mirrors.inc` adds a premirror for
+multitech.net tarballs.
+
+### Scripted build
+
+A handy script exists in _scripts/populate_ that can be used to build
 both the _mtcap_ and _mtcdt_ versions of the kernel and copy to a
 public repo.
 
-```
-$ layers/user-layer/scripts/populate 5.3.0b
+```sh
+layers/user-layer/scripts/populate 5.3.0b
 ```
 
-The above command will create *../mlinux-images/5.3.0b* and populate
+The above command will create _../mlinux-images/5.3.0b_ and populate
 it with the upgrade images and other files generated by bitbake:
 
-```
+```text
 jch@mittens[561]:mlinux-5.3.0b$ ls -l ../mlinux-images/5.3.0b/*
 ../mlinux-images/5.3.0b/mtcap:
 total 92456
@@ -140,7 +180,7 @@ total 92504
 This script assumes that the containerized build environment is
 installed as _../mlinux-be/_
 
-# See Also
+## See Also
 
 + [Pre-built mLinux images using this layer](https://github.com/IthacaThings/mlinux-images)
 + [Ansible configuration for managing Conduits](https://github.com/IthacaThings/ttn-multitech-cm)

@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# Mirror every publicly cloneable repo on git.multitech.net into
+# git/<name>.git and generate a gitconfig that redirects MultiTech URLs
+# to it.  Re-running updates existing mirrors.
+#
+# Usage: update-mirror DIR
+#
+# Repos under sm/ and mirrors/ require authentication and are skipped.
+
+set -eu
+
+CGIT=https://git.multitech.net/cgit
+if [ $# != 1 ]; then
+	echo "Usage: $(basename "$0") DIR" >&2
+	exit 1
+fi
+mkdir -p "$1"
+TOP=$(cd "$1" && pwd)
+GITDIR=${TOP}/git
+
+mkdir -p "${GITDIR}"
+
+repos=$(curl -fsS "${CGIT}/" |
+	grep -oE "href='/cgit/[^']+\.git/'" |
+	sed "s|href='/cgit/||;s|/'||" |
+	grep -vE '^(sm|mirrors)/' |
+	sort -u)
+
+failed=
+for repo in ${repos}; do
+	dest=${GITDIR}/${repo}
+	if [ -d "${dest}" ]; then
+		echo "Updating ${repo}"
+		git -C "${dest}" remote update --prune || failed="${failed} ${repo}"
+	else
+		echo "Cloning ${repo}"
+		mkdir -p "$(dirname "${dest}")"
+		git clone --mirror "${CGIT}/${repo}" "${dest}" ||
+			failed="${failed} ${repo}"
+	fi
+done
+
+# Generate a gitconfig that redirects every form of a MultiTech URL to
+# the mirror as seen inside the build container (/mirror).  Longest
+# insteadOf match wins, so "libmts" doesn't capture "libmts-io".
+gitconfig=${TOP}/gitconfig
+: > "${gitconfig}"
+for repo in ${repos}; do
+	name=${repo%.git}
+	for proto in git:// https://; do
+		for path in "${name}" "${name}.git" "cgit/${name}" "cgit/${name}.git"; do
+			git config -f "${gitconfig}" --add \
+				"url.file:///mirror/git/${repo}.insteadOf" \
+				"${proto}git.multitech.net/${path}"
+		done
+	done
+done
+
+if [ -n "${failed}" ]; then
+	echo "Failed:${failed}" >&2
+	exit 1
+fi

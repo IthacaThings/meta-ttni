@@ -11,6 +11,7 @@ remote_host=abomination.dreamhost.com
 remote_root=ttni.tech/mlinux
 
 do_build=yes
+do_production=
 do_delete=
 do_verbose=
 do_noop=
@@ -23,6 +24,10 @@ while [ $# -gt 0 ]; do
     case "${1}" in
 	--delete)
 	    do_delete=--delete
+	    shift
+	    ;;
+	--production)
+	    do_production=yes
 	    shift
 	    ;;
 	--no-build|--nobuild)
@@ -48,11 +53,17 @@ while [ $# -gt 0 ]; do
 done
 
 if [ $# != 1 ]; then
-   echo "${progname}: Usage VERSION" >&2
+   echo "${progname}: Usage [--production] VERSION" >&2
    exit 1
 fi
 
+# Publish to VERSION-devel for test gateways unless told this build is
+# ready for production
 version=$1
+if [ -z "${do_production}" ]; then
+    version="${version}-devel"
+fi
+verbose Publishing as ${version}
 
 # Build the two images
 if [ -n "${do_build}" ]; then

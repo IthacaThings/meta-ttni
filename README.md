@@ -64,6 +64,17 @@ distrusted after the October 2026 eMudhra compromise (see
 [ttn-multitech-cm#134](https://github.com/IthacaThings/ttn-multitech-cm/pull/134)).
 The package release is bumped so gateways upgrade from the feed.
 
+#### Other copies of the distrusted roots
+
+The `distrust-ca` class strips the same two roots, by SHA-256
+fingerprint, from CA bundles that recipes install themselves.  It
+handles PEM files and PEM files inside Python wheels, whose `RECORD`
+it updates.  The build fails if a listed file is missing or holds
+neither root.  It is applied to `python` for the pip wheel that
+`python-misc` bundles for `ensurepip`, the only such copy in the image.
+`python3-misc`, `python-pip` and `nss` also carry the roots but are
+only in the feed and not installed on the gateways.
+
 #### autossh
 
 Passes `--with-ssh` so configure doesn't need ssh on the build host.

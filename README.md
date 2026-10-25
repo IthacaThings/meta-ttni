@@ -25,6 +25,13 @@ via _opkg_ command.
 + perl
 + ruby
 + sqlite3
++ Bluetooth (bluez5, bluez5-mlinit, python-pybluez)
++ strongswan, lldpd and iperf3
++ lrzsz, hostapd, bridge-utils, inetutils-ftp, dosfstools and cifs-utils
+
+The Bluetooth kernel modules are still installed: the `kernel-modules`
+package depends on every module, so they can't be removed from the
+image individually (see #13).
 
 #### Adding packages to Conduit AP
 

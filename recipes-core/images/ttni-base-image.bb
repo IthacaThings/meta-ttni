@@ -132,6 +132,10 @@ IMAGE_INSTALL_append += "libmpsse"
 # Useful utilities
 IMAGE_INSTALL_append += "htop logrotate"
 
+# Ansible reads the distribution version from /etc/os-release; it was
+# only pulled in by lldpd, which is removed below
+IMAGE_INSTALL_append += "os-release"
+
 # Remove these to make the image smaller
 REMOVES=""
 
@@ -140,14 +144,19 @@ REMOVES += "dosfstools \
        	    cifs-utils"
 #  NETWORKING_FEATURES
 REMOVES += "bridge-utils \
-            inetutils-ftp"
+            inetutils-ftp \
+            iperf3 \
+            lldpd \
+            strongswan"
 #  WIFI_FEATURES
 REMOVES += "hostapd \
             hostapd-cfg"
 #  BLUETOOTH_FEATURES
-REMOVES += "bluez5 python-pybluez"
+REMOVES += "bluez5 bluez5-mlinit python-pybluez"
 #  MISC_FEATURES
 REMOVES += "lrzsz"
+# minicom recommends lrzsz, which would bring it back
+BAD_RECOMMENDATIONS += "lrzsz"
 
 IMAGE_INSTALL_remove += "${REMOVES}"
 

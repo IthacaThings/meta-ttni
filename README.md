@@ -46,7 +46,7 @@ the configuration files for the packet forwarder
 
 #### Monit
 
-Includes a later version
+Replaces mLinux's monit 5.22.0 with 6.0.0.
 
 #### openssl-bin
 

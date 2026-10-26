@@ -10,21 +10,43 @@
 ### END INIT INFO
 
 filter_links () {
-    local dirname=$1
+    dirname=$1
 
     echo '#!/bin/sh'
     echo 'echo "Restoring symlinks"'
 
-    while read target; do
+    while read -r target; do
 	source=$(readlink "${target}")
-	[[ "${source}" =~ ^${dirname}/ ]] && echo "ln -svf ${source} ${target}"
+	case "${source}" in
+	    "${dirname}"/*)
+		# A link to .../N found at D/N, where D is also named N, was
+		# put inside D by an earlier restore; it belongs at D
+		base="${target##*/}"
+		case "${target%/*}" in
+		    */"${base}")
+			case "${source}" in
+			    */"${base}") target="${target%/*}" ;;
+			esac
+			;;
+		esac
+		# The new image may have a directory, or a symlink to one, at
+		# target; ln would then create the link inside it.  Replace
+		# a real directory and don't follow an existing symlink.
+		echo "[ -d '${target}' ] && [ ! -L '${target}' ] && rm -rf '${target}'"
+		echo "ln -svfn '${source}' '${target}'"
+		# Remove the self-referencing link an earlier restore left
+		# inside the preserved directory
+		stray="${source}/${target##*/}"
+		echo "[ -L '${stray}' ] && [ \"\$(readlink '${stray}')\" = '${source}' ] && rm -f '${stray}'"
+		;;
+	esac
     done
 
     echo 'rm $0'
 }
 
 preserve_links () {
-    local dir=$1
+    dir=$1
 
     echo "Preserving links to /var/config"
 
@@ -36,16 +58,16 @@ preserve_links () {
 
     links_file=${restdir}/10links
 
-    find / -xdev -type l | filter_links ${dir} > "${links_file}"
+    find / -xdev -type l | filter_links "${dir}" > "${links_file}"
     chmod 700 "${links_file}"
 
-    echo "${links_file} containes $(grep -cF " ${dir}" ${links_file}) links to ${dir} to be restored on reinstall"
+    echo "${links_file} contains $(grep -c '^ln -svfn ' "${links_file}") links to ${dir} to be restored on reinstall"
 }
 
 echo "${0}: ${*}"
 
 # We only run during "stop"
-test -z "${1}" -o "${1}" == "stop" || exit 0
+test -z "${1}" -o "${1}" = "stop" || exit 0
 
 if [ -f /var/volatile/do_flash_upgrade ]; then
     preserve_links /var/config

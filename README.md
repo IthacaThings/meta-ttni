@@ -109,6 +109,13 @@ This runs at shutdown and if /var/volatile/do_flash_upgrade exists,
 makes a list of links into /var/config and stores them as an
 executable shell script.
 
+The script replaces whatever the new image has at each link's path:
+a real directory is removed, and an existing symlink is replaced
+rather than followed (`ln -sfn`).  Otherwise a preserved link such as
+`/home/mtadm/.ssh` would be created inside the image's directory, and
+mtadm's ssh keys would be lost.  It also repairs links that an earlier
+restore misplaced this way.
+
 #### restore_config
 
 This runs at startup only at the first boot after a firmware upgrade

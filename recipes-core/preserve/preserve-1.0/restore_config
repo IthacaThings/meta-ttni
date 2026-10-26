@@ -12,14 +12,14 @@
 echo "${0}: ${*}"
 
 # We only run during "start"
-test -z "${1}" -o "${1}" == "start" || exit 0
+test -z "${1}" -o "${1}" = "start" || exit 0
 
 FLAGFILE=/var/lib/restore.done
 
 . /etc/default/rcS
 
 if [ -f "${FLAGFILE}" ]; then
-    test "${VERBOSE}" == "no" || echo "Not performing restore after initial boot"
+    test "${VERBOSE}" = "no" || echo "Not performing restore after initial boot"
     exit 0
 fi
 
@@ -30,7 +30,7 @@ fi
 
 for dir in ${RESTORE_DIRS}; do
     test -d "${dir}/restore.d" || continue
-    test "${VERBOSE}" == "no" || echo "Running restore in ${dir}"
+    test "${VERBOSE}" = "no" || echo "Running restore in ${dir}"
     run-parts "${dir}/restore.d"
 done
 
